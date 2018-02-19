@@ -2,10 +2,16 @@ package com.example.boundservice;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
+import android.os.IInterface;
+import android.os.Parcel;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.widget.Chronometer;
+
+import java.io.FileDescriptor;
 
 /**
  * Created by usuario on 16/02/18.
@@ -14,18 +20,14 @@ import android.widget.Chronometer;
 public class BoundService extends Service {
 
     private Chronometer chronometer;
+    IBinder iBinder;
 
     @Override
     public void onCreate() {
         super.onCreate();
         chronometer = new Chronometer(this);
         chronometer.setBase(SystemClock.elapsedRealtime());
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+        iBinder = new MyBinder();
     }
 
     @Override
@@ -49,4 +51,31 @@ public class BoundService extends Service {
 
         return hours + ":" + minutes + ":" + seconds + ":" + milis;
     }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return iBinder;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+    }
+
+
+    class MyBinder extends Binder {
+
+        BoundService getService() {
+            return BoundService.this;
+        }
+
+    }
+
+
 }
